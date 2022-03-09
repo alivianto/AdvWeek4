@@ -1,15 +1,54 @@
 package com.ubaya.advweek4.viewmodel
 
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ubaya.advweek4.model.Student
 
-class ListViewModel:ViewModel() {
+class ListViewModel(application: Application):AndroidViewModel(application) {
     val studentsLiveData = MutableLiveData<ArrayList<Student>>()
     val studentLoadErrorLiveData = MutableLiveData<Boolean>()
     val loadingLiveData = MutableLiveData<Boolean>()
 
+    val TAG = "volleyTag"
+    private var queue:RequestQueue ?= null
+
     fun refresh() {
+        studentLoadErrorLiveData.value = false
+        loadingLiveData.value = true
+
+        queue = Volley.newRequestQueue(getApplication())
+        var url = "http://adv.jitusolution.com/student.php"
+
+        val stringRequest = StringRequest(
+            Request.Method.GET, url,
+            { response ->
+                val sType = object : TypeToken<ArrayList<Student>>() { }.type
+                val result = Gson().fromJson<ArrayList<Student>>(response, sType)
+                studentsLiveData.value = result
+                loadingLiveData.value = false
+                Log.d("showvolley", response.toString())
+            },
+            {
+                loadingLiveData.value = false
+                studentLoadErrorLiveData.value = true
+                Log.d("errorvolley", it.toString())
+            }
+        ).apply {
+            tag = "TAG"
+        }
+        // stringRequest.tag = TAG
+        queue?.add(stringRequest)
+
+        /*
         studentsLiveData.value = arrayListOf(
             Student("16055","Nonie","1998/03/28","5718444778","http://dummyimage.com/75x100" +
                     ".jpg/cc0000/ffffff"),
@@ -19,5 +58,11 @@ class ListViewModel:ViewModel() {
         )
         studentLoadErrorLiveData.value = false
         loadingLiveData.value = false
+        */
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        queue?.cancelAll(TAG)
     }
 }
