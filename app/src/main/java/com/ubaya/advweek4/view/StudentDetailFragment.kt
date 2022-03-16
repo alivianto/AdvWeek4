@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.ubaya.advweek4.R
-import com.ubaya.advweek4.model.Student
+import com.ubaya.advweek4.util.loadImage
 import com.ubaya.advweek4.viewmodel.DetailViewModel
-import com.ubaya.advweek4.viewmodel.ListViewModel
 import kotlinx.android.synthetic.main.fragment_student_detail.*
+import kotlinx.android.synthetic.main.student_list_item.view.*
 
 /**
  * A simple [Fragment] subclass.
@@ -28,18 +28,28 @@ class StudentDetailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        var id = ""
+        arguments?.let{
+            id = StudentDetailFragmentArgs.fromBundle(requireArguments()).id
+        }
         viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
-        viewModel.fetch()
+        viewModel.fetch(id)
 
         observeViewModel()
     }
 
     private fun observeViewModel() {
         viewModel.studentLiveData.observe(viewLifecycleOwner) {
-            editID.setText(it.id)
-            editName.setText(it.name)
-            editDOB.setText(it.dob)
-            editPhone.setText(it.phone)
+            val student = viewModel.studentLiveData.value
+            student?.let {
+                imageStudentDetailPhoto.loadImage(it.photoURL, progressLoadingStudentDetailPhoto)
+                editID.setText(it.id)
+                editName.setText(it.name)
+                editDOB.setText(it.dob)
+                editPhone.setText(it.phone)
+                //imageStudentPhoto.loadImage(student.photoURL, progressLoadingStudentPhoto)
+            }
+
         }
     }
 }
