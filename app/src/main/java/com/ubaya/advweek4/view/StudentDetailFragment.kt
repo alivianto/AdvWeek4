@@ -1,6 +1,7 @@
 package com.ubaya.advweek4.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.ubaya.advweek4.R
 import com.ubaya.advweek4.util.loadImage
 import com.ubaya.advweek4.viewmodel.DetailViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_student_detail.*
 import kotlinx.android.synthetic.main.student_list_item.view.*
+import java.util.concurrent.TimeUnit
 
 /**
  * A simple [Fragment] subclass.
@@ -41,13 +46,24 @@ class StudentDetailFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.studentLiveData.observe(viewLifecycleOwner) {
             val student = viewModel.studentLiveData.value
+            Log.d("hasil",student.toString())
             student?.let {
                 imageStudentDetailPhoto.loadImage(it.photoURL, progressLoadingStudentDetailPhoto)
                 editID.setText(it.id)
                 editName.setText(it.name)
                 editDOB.setText(it.dob)
                 editPhone.setText(it.phone)
-                //imageStudentPhoto.loadImage(student.photoURL, progressLoadingStudentPhoto)
+
+                buttonNotif.setOnClickListener {
+                    Observable.timer(5, TimeUnit.SECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            Log.d("mynotif", "Notification delayed after 5 seconds")
+                            MainActivity.showNotification(student.name.toString(), "Notification created",
+                            R.drawable.ic_baseline_person_24)
+                        }
+                }
             }
 
         }

@@ -19,7 +19,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val TAG = "volletTag"
     private var queue: RequestQueue ?= null
 
-    fun fetch(id: String) {
+    fun fetch(id: String?) {
 //        studentLiveData.value = Student("16055","Nonie","1998/03/28","5718444778","http://dummyimage.com/75x100" +
 //                ".jpg/cc0000/ffffff")
 
