@@ -3,15 +3,22 @@ package com.ubaya.advweek4.util
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.media.Image
 import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.databinding.BindingAdapter
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.ubaya.advweek4.R
 import kotlinx.android.synthetic.main.student_list_item.view.*
 import java.lang.Exception
+
+@BindingAdapter("android:imageUrl","android:progressBar")
+fun loadImageFromUrl(view: ImageView, url: String, pb: ProgressBar) {
+    view.loadImage(url, pb)
+}
 
 fun ImageView.loadImage(url: String?, progressBar: ProgressBar) {
     Picasso.get()
